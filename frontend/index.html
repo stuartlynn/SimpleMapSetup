@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+        <title>Add layer | CARTO</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta charset="UTF-8">
+        <!-- Include CARTO VL JS -->
+        <script src="http://libs.cartocdn.com/carto-vl/v0.8.0/carto-vl.js"></script>
+        <!-- Include Mapbox GL JS -->
+        <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+        <!-- Include Mapbox GL CSS -->
+        <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
+        <style>
+           html, body {
+               margin: 0;
+           }
+           #map {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+            }
+            #queryBox{
+                position: absolute;
+                z-index: 1000;
+                top: 20px;
+                left:20px;
+            }
+        </style>
+        </head>
+        <body>
+        <div id="map"></div>
+        <input id='queryBox' type='text'>
+        </input>
+
+        <script>
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json',
+                center: [-73.95341440916246, 40.742972471073756],
+                zoom: 12.099079866332634,
+                dragRotate: false,
+                touchZoomRotate: false
+            });
+
+            const testSource = new carto.source.MVT('http://pulaski-421.ddns.net:8886/tiles/{z}/{x}/{y}.mvt?q=select *, id cartodb_id from tracts')
+            const testViz    = new carto.Viz(`
+              color: red
+            `);
+
+            const testLayer  = new carto.Layer('layer', testSource,testViz)
+            const queryText = document.getElementById('queryBox')
+            queryText.addEventListener('keydown',(e)=>{
+              console.log(e)
+            })
+						map.on('load', ()=>{
+              console.log('adding layer')
+							/*map.addLayer({
+								'id' : 'tracts',
+							  'type': 'fill',
+								'source': {
+									tiles:[ 'http://pulaski-421.ddns.net:8886/tiles/{z}/{x}/{y}.mvt?q=select * from tracts'],
+								  type: 'vector',
+								},
+                'source-layer': 'layer',
+								'paint':{
+									'fill-color':'#ff69b4'
+								}
+							})*/
+              testLayer.addTo(map)
+						})
+        </script>
+        </body>
+        </html>
+

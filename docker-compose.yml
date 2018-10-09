@@ -1,0 +1,73 @@
+version: '3.0'
+
+services:
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+     - "8885:5000"
+    depends_on:
+      - redis
+    volumes:
+      - ./api:/api
+  frontend:
+    image : halverneus/static-file-server
+    volumes:
+      -  ./frontend:/web
+    ports:
+      - "8884:8080"
+  worker:
+    build:
+      context: workers
+      dockerfile: Dockerfile
+    depends_on:
+      - redis
+    volumes:
+      - ./workers:/queue
+    entrypoint: watchmedo auto-restart -d . -p '*.py' --  celery -A  tasks worker --loglevel=info
+  monitor:
+    build:
+      context: workers
+      dockerfile: Dockerfile
+    ports:
+     - "5555:5555"
+    entrypoint: flower
+    command:  -A tasks --port=5555 --broker=redis://redis:6379/0
+    depends_on:
+      - redis
+  redis:
+    image: redis
+  tilter:
+    build:
+      context: ./tiler
+      dockerfile: Dockerfile
+    ports:
+      - "8886:8886"
+    depends_on:
+      - postgis
+    volumes:
+      - ./tiler:/src
+    environment:
+      - PGHOST=postgis
+      - PGPPORT=5432
+      - PGPASSWORD=password
+      - PGUSER=carto
+  notebook:
+    image: 'jupyter/datascience-notebook'
+    command: 'jupyter lab --ip=* --port=8888 --no-browser  --allow-root'
+    ports:
+      - '8882:8888'
+    volumes:
+      - ./notebooks:/home/jovyan/notebooks
+  postgis:
+    image: mdillon/postgis
+    environment:
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=carto
+    ports:
+      - "8881:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+
