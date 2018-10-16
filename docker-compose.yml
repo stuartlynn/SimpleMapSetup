@@ -61,6 +61,20 @@ services:
       - '8882:8888'
     volumes:
       - ./notebooks:/home/jovyan/notebooks
+  uploader:
+    build:
+      context: ./uploader
+    volumes:
+      - ./uploader:/app
+    environment:
+      - PGHOST=postgis
+      - PGPPORT=5432
+      - PGPASSWORD=password
+      - PGUSER=carto
+    ports:
+      - "8883:3000"
+    depends_on:
+      - postgis
   postgis:
     image: mdillon/postgis
     environment:

@@ -1,6 +1,7 @@
 node_modules/
 pg_data/
 *.env
+uploader/data
 
 # Swap
 [._]*.s[a-v][a-z]
