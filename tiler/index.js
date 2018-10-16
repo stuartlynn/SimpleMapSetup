@@ -6,6 +6,7 @@ import Router from 'express-promise-router'
 import db from './db'
 import SphericalMercator from 'sphericalmercator'
 import cors  from 'cors'
+import compression from 'compression'
 
 const mercator = new SphericalMercator({size:256})
 
@@ -45,7 +46,7 @@ router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
               ST_MakeEnvelope(${bbox[0]}, ${bbox[1]}, ${bbox[2]}, ${bbox[3]}, 4326),
               4096,
               256,
-              false
+              true
           ) geom
       FROM (
         ${query}
@@ -61,7 +62,7 @@ router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
     if(tileData.length===0){
       res.status(204)
     }
-    console.log( (Date.now() - startTime)/1000.0)
+    console.log("Tile served in ", (Date.now() - startTime)/1000.0, "s")
     res.send(tileData)
   }
   catch (e){
@@ -71,6 +72,8 @@ router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
   }
 
 })
+
+app.use(compression())
 app.use(cors())
 app.use('/',router)
 
