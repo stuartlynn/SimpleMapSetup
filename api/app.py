@@ -1,5 +1,5 @@
 from flask import Flask
-from flask import url_for
+from flask import url_for, request
 from worker import celery
 import celery.states as states
 
@@ -14,12 +14,20 @@ def home():
 def add(param1, param2):
     task = celery.send_task('tasks.add', args=[param1, param2], kwargs={})
     response = "<a href='{url}'>check status of {id} </a>".format(id=task.id,
-                                                                  url=url_for('check_task', task_id=task.id, external=True))
+                                                                  url=url_for("check_task'", task_id=task.id, external=True))
     return response
 
 @app.route('/gauss')
 def gauss():
     task = celery.send_task('tasks.make_gaussian',args=[],kwargs={})
+    response = "<a href='{url}'>check status of {id} </a>".format(id=task.id,
+                                                                  url=url_for('check_task', task_id=task.id, external=True))
+    return response
+
+@app.route('/umap')
+def umap():
+    table = request.args.get('table')
+    task = celery.send_task('tasks.umap',args=[table],kwargs={})
     response = "<a href='{url}'>check status of {id} </a>".format(id=task.id,
                                                                   url=url_for('check_task', task_id=task.id, external=True))
     return response

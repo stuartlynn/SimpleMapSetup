@@ -8,5 +8,5 @@ COPY . /queue
 WORKDIR /queue
 
 RUN pip install -r requirements.txt
-
+RUN pip install pandas geopandas Shapely numpy psycopg2
 ENTRYPOINT celery -A tasks worker --loglevel=info

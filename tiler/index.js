@@ -25,7 +25,7 @@ router.get('/query/', async (req,res)=>{
 router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
    const startTime  = Date.now()
    const {z,x,y} = req.params;
-   const bbox = mercator.bbox(x,y,z,false)
+  const bbox = mercator.bbox(x,y,z,false)
    const layer_name = req.query['layer'] ? req.query['layer'] : 'layer'
    const query = req.query['q']
 
@@ -43,7 +43,7 @@ router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
           ${columns.join(',')},
           ST_AsMVTGeom(
               geom,
-              ST_MakeEnvelope(${bbox[0]}, ${bbox[1]}, ${bbox[2]}, ${bbox[3]}, 4326),
+              ST_MakeEnvelope(${bbox[0]}, ${bbox[1]}, ${bbox[2]}, ${bbox[3]}, 4286),
               4096,
               256,
               true
@@ -51,8 +51,10 @@ router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
       FROM (
         ${query}
       ) c
+      where geom && ST_MakeEnvelope(${bbox[0]}, ${bbox[1]}, ${bbox[2]}, ${bbox[3]}, 4286)
     ) q
    `
+
 
   try{
     const result = await db(SQL)
@@ -62,7 +64,9 @@ router.get('/tiles/:z/:x/:y.mvt', async (req,res)=>{
     if(tileData.length===0){
       res.status(204)
     }
-    console.log("Tile served in ", (Date.now() - startTime)/1000.0, "s")
+    console.log("Tile ",x,y,z," ",bbox[0],bbox[1],bbox[2],bbox[3],
+      " served in ", (Date.now() - startTime)/1000.0, "s"
+    )
     res.send(tileData)
   }
   catch (e){

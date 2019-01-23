@@ -27,6 +27,11 @@ services:
     volumes:
       - ./workers:/queue
     entrypoint: watchmedo auto-restart -d . -p '*.py' --  celery -A  tasks worker --loglevel=info
+    environment:
+      - PGHOST=postgis
+      - PGPPORT=5432
+      - PGPASSWORD=password
+      - PGUSER=carto
   monitor:
     build:
       context: workers
@@ -58,7 +63,7 @@ services:
     image: 'jupyter/datascience-notebook'
     command: 'jupyter lab --ip=* --port=8888 --no-browser  --allow-root'
     ports:
-      - '8882:8888'
+      - '8880:8888'
     volumes:
       - ./notebooks:/home/jovyan/notebooks
   uploader:

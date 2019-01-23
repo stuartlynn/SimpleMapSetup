@@ -5,9 +5,10 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
         <!-- Include CARTO VL JS -->
-        <script src="http://libs.cartocdn.com/carto-vl/v0.8.0/carto-vl.js"></script>
+        <script src="http://libs.cartocdn.com/carto-vl/v0.9.1/carto-vl.js"></script>
         <!-- Include Mapbox GL JS -->
         <script src="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.js"></script>
+
         <!-- Include Mapbox GL CSS -->
         <link href="https://libs.cartocdn.com/mapbox-gl/v0.48.0-carto1/mapbox-gl.css" rel="stylesheet" />
         <style>
@@ -68,15 +69,15 @@
             const map = new mapboxgl.Map({
                 container: 'map',
                 style: 'mapbox://styles/mapbox/satellite-v9',
-                center: [-99.32448250728919, 38.88391369825018],
-                zoom: 13.744432154117998,
+                center: [-94.57857, 39.09973],
+                zoom: 10,
                 dragRotate: false,
                 touchZoomRotate: false
             });
 
-            const testSource = new carto.source.MVT('http://pulaski-421.ddns.net:8886/tiles/{z}/{x}/{y}.mvt?q=select wkb_geometry as geom,  ogc_fid cartodb_id from kansas')
+            const testSource = new carto.source.MVT('http://pulaski-421.ddns.net:8886/tiles/{z}/{x}/{y}.mvt?q=select *, wkb_geometry as geom, ogc_fid  as cartodb_id from kansas')
             const testViz    = new carto.Viz(`
-              color : rgba(255, 0, 0, 0.4)
+              color : red
               strokeWidth : 0
             `);
 
@@ -87,11 +88,11 @@
             })
 						map.on('load', ()=>{
               console.log('adding layer')
-              /*map.addLayer({
+             /* map.addLayer({
                 'id' : 'tracts',
                 'type': 'fill',
                 'source': {
-                  tiles:[ 'http://pulaski-421.ddns.net:8886/tiles/{z}/{x}/{y}.mvt?q=select * from tracts'],
+                  tiles:[ 'http://pulaski-421.ddns.net:8886/tiles/{z}/{x}/{y}.mvt?q=select *, wkb_geometry as geom from kansas'],
                   type: 'vector',
                 },
                 'source-layer': 'layer',
@@ -99,7 +100,7 @@
                   'fill-color':'#ff69b4'
                 }
               })*/
-              testLayer.addTo(map)
+                testLayer.addTo(map );
 						})
         </script>
         </body>
